@@ -1,46 +1,46 @@
-# Chromium Extension Service
+# Servicios de extensión de chromium
 
-This is a service used by [Chromium Update Notifications](https://github.com/kkkrist/chromium-notifier) for error tracking and to increase privacy when fetching update info for installed extensions from the Chrome Web Store (strips cookies with personal data).
+Esto es un servicio usado por [Notificador Chromium](https://github.com/PinkLittleKitty/chromium-notifier) para tener un seguimiento de errores y para aumentar la privacidad al buscar información de actualizaciones para las extensiones instaladas desde la Chrome Web Store (extrae cookies con datos personales).
 
-## Requirements
+## Requerimientos
 
 - [Vercel](https://vercel.com/)
-- A MongoDB database (for persistence and caching)
-- The environment variable `MONGODB_URI` provided via Vercel Secrets (prod) or a local `.env` file (dev)
+- Una base de datos MongoDB (para persistencia y caché)
+- La variable de entorno `MONGODB_URI` proporcionada por Vercel Secrets (prod) o un archivo `.env` local (dev)
 
-## Usage
+## Uso
 
-Note: The responses you see here is all that's ever saved anywhere, nothing else – particularly client (end user) data – is collected.
+Nota: Las respuestas que ves acá son todo lo que se guardó alguna vez, nada más - particularmente datos de usuario - se recolecta.
 
 ### Seguimiento de errores
 
-Helps improving the extension.
+Ayuda a mejorar la extensión.
 
-Send a `POST` request to `/api/errorlogs` with the following JSON body:
+Enviá un `POST` a `/api/errorlogs` con el siguiente body en JSON:
 
 ```json
 {
-  "error": "JSON.stringify(<Error object>, Object.getOwnPropertyNames(<Error object>))",
-  "pluginVersion": "<plugin version used>"
+  "error": "JSON.stringify(<objeto de error>, Object.getOwnPropertyNames(<objeto de error>))",
+  "pluginVersion": "<La versión del plugin usada>"
 }
 ```
 
-The service will then store the following document in the database:
+El servicio va a guardar el siguiente documento en su base de datos:
 
 ```json
 {
   "_id": "5dc89e461f8c375aa22424cc",
-  "createdAt": "2019-11-10T23:33:26.525Z",
-  "error": "<Error object>",
+  "createdAt": "<fecha>",
+  "error": "<objeto de error>",
   "hashedIp": "1a3a493b",
-  "pluginVersion": "<plugin version used>",
-  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.390 4.97 Safari/537.36"
+  "pluginVersion": "<versión de el plugin que usaste>",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, como Gecko) Chrome/78.0.390 4.97 Safari/537.36"
 }
 ```
 
 ### Información de versiones de las extensiones instaladas
 
-When your browser requests data from `update_url` endpoints directly, cookies with personal data might be transmitted along the way. In my test set-up, requests to `update_url`s of extensions obtained from Chrome Web Store included the following personal data and adtech-related cookies (even though I wasn't logged in into any Google account):
+Cuando tu navegador busca datos desde `update_url` directamente, puede que se transmitan cookies. En mi testeo, pedidos a `update_url` de extensiones descargadas desde la Chrome Web Store incluyeron los siguientes datos personales y cookies (aunque siquiera estaba logueado en mi cuenta de google):
 
 * [1P_JAR](https://cookiepedia.co.uk/cookies/APISID/1P_JAR)
 * [APISID](https://cookiepedia.co.uk/cookies/APISID/APISID)
@@ -51,24 +51,24 @@ When your browser requests data from `update_url` endpoints directly, cookies wi
 * [SIDCC](https://cookiepedia.co.uk/cookies/APISID/SIDCC)
 * [SSID](https://cookiepedia.co.uk/cookies/APISID/SSID)
 
-(See also [https://policies.google.com/technologies/types](https://policies.google.com/technologies/types))
+(Ver también [https://policies.google.com/technologies/types](https://policies.google.com/technologies/types))
 
-If you don't want these cookies to be transmitted, you can use this proxy endpoint to request version info for installed extensions. Enabling "Increase privacy" in [Chromium Update Notifications](https://github.com/kkkrist/chromium-notifier) does exactly that.
+Si no querés que se transmitan estas cookies, podés usar este proxy para pedir información de versiones para extensiones instaladas. Habilitar "Aumentar privacidad" en [Notificador Chromium](https://github.com/PinkLittleKitty/chromium-notifier) hace exactamente eso.
 
-Send a `POST` request to `/api` with the following JSON body:
+Mandá un `POST` a `/api` con el siguiente body en JSON:
 
 ```json
 {
-  "prodversion": "<Chromium version>",
+  "prodversion": "<Versión de Chromium>",
   "extensions": [
-    { "id": "<extension id>",  "updateUrl": "<URL to Omaha-compatible endpoint>"},
-    { "id": "<extension id>",  "updateUrl": "<URL to Omaha-compatible endpoint>"},
+    { "id": "<id de la extensión>",  "updateUrl": "<URL a un endpoint compatible con Omaha>"},
+    { "id": "<id de la extensión>",  "updateUrl": "<URL a un endpoint compatible con Omaha>"},
     …
   ]
 }
 ```
 
-The service will respond with an array consisting of version info and meta data of said extensions:
+El servicio va a responder con un array que consistirá ded la información de versión y los metadatos de dichas extensiones:
 
 ```json
 [
