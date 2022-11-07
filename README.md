@@ -12,7 +12,7 @@ This is a service used by [Chromium Update Notifications](https://github.com/kkk
 
 Note: The responses you see here is all that's ever saved anywhere, nothing else – particularly client (end user) data – is collected.
 
-### Error tracking
+### Seguimiento de errores
 
 Helps improving the extension.
 
