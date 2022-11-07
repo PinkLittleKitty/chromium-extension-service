@@ -38,7 +38,7 @@ The service will then store the following document in the database:
 }
 ```
 
-### Version info for installed extensions
+### Información de versiones de las extensiones instaladas
 
 When your browser requests data from `update_url` endpoints directly, cookies with personal data might be transmitted along the way. In my test set-up, requests to `update_url`s of extensions obtained from Chrome Web Store included the following personal data and adtech-related cookies (even though I wasn't logged in into any Google account):
 
